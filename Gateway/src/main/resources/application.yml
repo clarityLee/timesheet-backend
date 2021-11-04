@@ -14,8 +14,18 @@ spring:
     name: spring-cloud-gateway
   cloud:
     gateway:
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            allowedOrigins: "http://localhost:3000"
+            allowedMethods: "*"
+            allowedHeaders: "*"
       routes:
-        - id: auth-server
-          uri: lb://auth-server
+        - id: auth-service
+          uri: lb://auth-service
           predicates:
             - Path=/auth/**
+        - id: user-service
+          uri: lb://user-service
+          predicates:
+            - Path=/user-service/**
