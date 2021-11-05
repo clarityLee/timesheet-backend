@@ -5,10 +5,14 @@ import com.beaconfire.userservice.domain.User;
 import com.beaconfire.userservice.security.JwtUtil;
 import com.beaconfire.userservice.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.Produces;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/user-service")
@@ -43,11 +47,14 @@ public class UserServiceController {
     }
 
     // ↓↓------------- Cynthia --------------------- ↓↓
-
-
-
-
-
+    @PostMapping(value = "/update-profile")
+//    @Produces(MediaType.APPLICATION_JSON)
+    public ResponseEntity<User> updateProfile(@RequestBody Map<String, String> updatedInfo, HttpServletRequest httpServletRequest) {
+//        String username = JwtUtil.getSubject(httpServletRequest, Constant.JWT_TOKEN_COOKIE_NAME, Constant.SIGNING_KEY);
+        String username = updatedInfo.get("username");
+        User updatedUserProfile = userService.updateUserProfile(username, updatedInfo);
+        return new ResponseEntity<>(updatedUserProfile, HttpStatus.OK);
+    }
 
     // ↓↓ -------------- Xian ------------------------ ↓↓
 

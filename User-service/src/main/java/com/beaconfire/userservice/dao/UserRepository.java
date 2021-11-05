@@ -13,8 +13,7 @@ public interface UserRepository extends MongoRepository<User, ObjectId> {
     public Optional<User> findByUsername(String username);
 
     // ↓↓------------- Cynthia --------------------- ↓↓
-
-
+    public User save(User user);
 
 
     // ↓↓ -------------- Xian ------------------------ ↓↓
