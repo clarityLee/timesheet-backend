@@ -6,6 +6,7 @@ import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -42,7 +43,20 @@ public class UserService {
     }
 
     // ↓↓------------- Cynthia --------------------- ↓↓
-
+    public User updateUserProfile(String username, Map<String, String> updatedInfo) {
+        Optional<User> optionalUser = userRepository.findByUsername(username);
+        User user = optionalUser.get();
+        if (updatedInfo.containsKey("phone")) {
+            user.setPhone(updatedInfo.get("phone"));
+        }
+        if (updatedInfo.containsKey("email")) {
+            user.setPhone(updatedInfo.get("email"));
+        }
+        if (updatedInfo.containsKey("address")) {
+            user.setPhone(updatedInfo.get("address"));
+        }
+        return userRepository.save(user);
+    }
 
 
 
