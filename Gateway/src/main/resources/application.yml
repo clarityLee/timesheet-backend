@@ -20,6 +20,7 @@ spring:
             allowedOrigins: "http://localhost:3000"
             allowedMethods: "*"
             allowedHeaders: "*"
+            allowCredentials: "true"
       routes:
         - id: auth-service
           uri: lb://auth-service

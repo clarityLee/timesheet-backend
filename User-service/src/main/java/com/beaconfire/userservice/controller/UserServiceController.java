@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 
 @RestController
+//@CrossOrigin(origins = "http://localhost:3000", allowCredentials = "true")
 @RequestMapping("/user-service")
 public class UserServiceController {
 
@@ -22,7 +23,7 @@ public class UserServiceController {
 
     // ↓↓ ------------ Yun-Jing ------------ ↓↓
     @PostMapping("/login")
-    public ResponseEntity<User> login(@RequestParam String username, @RequestParam String password) {
+    public ResponseEntity<User> login(String username, String password) {
         return ResponseEntity.ok(userService.login(username, password));
     }
 
