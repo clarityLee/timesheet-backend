@@ -50,16 +50,13 @@ public class UserService {
             user.setPhone(updatedInfo.get("phone"));
         }
         if (updatedInfo.containsKey("email")) {
-            user.setPhone(updatedInfo.get("email"));
+            user.setEmail(updatedInfo.get("email"));
         }
         if (updatedInfo.containsKey("address")) {
-            user.setPhone(updatedInfo.get("address"));
+            user.setAddress(updatedInfo.get("address"));
         }
         return userRepository.save(user);
     }
-
-
-
 
     // ↓↓ -------------- Xian ------------------------ ↓↓
 

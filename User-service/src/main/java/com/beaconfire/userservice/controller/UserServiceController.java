@@ -57,6 +57,14 @@ public class UserServiceController {
         return new ResponseEntity<>(updatedUserProfile, HttpStatus.OK);
     }
 
+    @GetMapping(value = "/user-profile")
+    public ResponseEntity<User> getUserProfile() {
+//        String username = JwtUtil.getSubject(httpServletRequest, Constant.JWT_TOKEN_COOKIE_NAME, Constant.SIGNING_KEY);
+        String username = "john";
+        User user = userService.queryUserByName(username);
+        return new ResponseEntity<>(user, HttpStatus.OK);
+    }
+
     // ↓↓ -------------- Xian ------------------------ ↓↓
 
 
