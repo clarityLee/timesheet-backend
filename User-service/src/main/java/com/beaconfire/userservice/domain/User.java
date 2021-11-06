@@ -1,5 +1,6 @@
 package com.beaconfire.userservice.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -20,6 +21,7 @@ public class User {
     @Id
     private ObjectId id;
     private String username;
+    @JsonIgnore
     private String password;
     private String phone;
     private String email;

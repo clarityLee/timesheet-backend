@@ -1,6 +1,8 @@
 package com.beaconfire.userservice.controller;
 
 import com.beaconfire.userservice.constant.Constant;
+import com.beaconfire.userservice.domain.TimeSheet;
+import com.beaconfire.userservice.domain.UpdateTimesheetRequest;
 import com.beaconfire.userservice.domain.User;
 import com.beaconfire.userservice.security.JwtUtil;
 import com.beaconfire.userservice.service.UserService;
@@ -12,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Produces;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -49,20 +52,29 @@ public class UserServiceController {
 
     // ↓↓------------- Cynthia --------------------- ↓↓
     @PostMapping(value = "/update-profile")
-//    @Produces(MediaType.APPLICATION_JSON)
     public ResponseEntity<User> updateProfile(@RequestBody Map<String, String> updatedInfo, HttpServletRequest httpServletRequest) {
-//        String username = JwtUtil.getSubject(httpServletRequest, Constant.JWT_TOKEN_COOKIE_NAME, Constant.SIGNING_KEY);
-        String username = updatedInfo.get("username");
+        String username = JwtUtil.getSubject(httpServletRequest, Constant.JWT_TOKEN_COOKIE_NAME, Constant.SIGNING_KEY);
+//        String username = "john";
         User updatedUserProfile = userService.updateUserProfile(username, updatedInfo);
         return new ResponseEntity<>(updatedUserProfile, HttpStatus.OK);
     }
 
     @GetMapping(value = "/user-profile")
-    public ResponseEntity<User> getUserProfile() {
-//        String username = JwtUtil.getSubject(httpServletRequest, Constant.JWT_TOKEN_COOKIE_NAME, Constant.SIGNING_KEY);
-        String username = "john";
+    public ResponseEntity<User> getUserProfile(HttpServletRequest httpServletRequest) {
+        String username = JwtUtil.getSubject(httpServletRequest, Constant.JWT_TOKEN_COOKIE_NAME, Constant.SIGNING_KEY);
+//        String username = "john";
         User user = userService.queryUserByName(username);
         return new ResponseEntity<>(user, HttpStatus.OK);
+    }
+
+    @PostMapping(value = "/update-timesheet")
+    public ResponseEntity<Void> updateTimesheetByUsername(@RequestBody UpdateTimesheetRequest updateTimesheetRequest) {
+        String username = updateTimesheetRequest.getUsername();
+        List<TimeSheet> timesheets = updateTimesheetRequest.getTimeSheetList();
+        System.out.println("successfully in user service client: " + username);
+        User user = userService.updateTimesheetByUsername(username, timesheets);
+        return new ResponseEntity<>(HttpStatus.OK);
+//        return null;
     }
 
     // ↓↓ -------------- Xian ------------------------ ↓↓

@@ -30,3 +30,7 @@ spring:
           uri: lb://user-service
           predicates:
             - Path=/user-service/**
+        - id: timesheet-service
+          uri: lb://timesheet-service
+          predicates:
+            - Path=/timesheet-service/**

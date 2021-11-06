@@ -44,7 +44,6 @@ public class LoginController {
         String token = JwtUtil.generateToken(signingKey, username, Objects.requireNonNull(res.getBody()).getId().toString());
         CookieUtil.create(response, jwtTokenCookieName, token, false,
                 COOKIE_DURATION_SECONDS, "localhost");
-
         return new ResponseEntity<>(HttpStatus.OK);
     }
 

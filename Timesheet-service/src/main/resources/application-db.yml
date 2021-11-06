@@ -1,0 +1,5 @@
+spring:
+  data:
+    mongodb:
+      uri: mongodb+srv://bfsTimesheetSys:aaOULjvm0wPmcKBR@devcluster.w5pki.mongodb.net/timesheet?retryWrites=true&w=majority
+      database: timesheet

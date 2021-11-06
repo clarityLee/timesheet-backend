@@ -1,11 +1,13 @@
 package com.beaconfire.userservice.service;
 
 import com.beaconfire.userservice.dao.UserRepository;
+import com.beaconfire.userservice.domain.TimeSheet;
 import com.beaconfire.userservice.domain.User;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -55,6 +57,12 @@ public class UserService {
         if (updatedInfo.containsKey("address")) {
             user.setAddress(updatedInfo.get("address"));
         }
+        return userRepository.save(user);
+    }
+
+    public User updateTimesheetByUsername(String username, List<TimeSheet> timesheets) {
+        User user = this.queryUserByName(username);
+        user.setTimeSheets(timesheets);
         return userRepository.save(user);
     }
 
