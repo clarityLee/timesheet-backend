@@ -12,6 +12,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @RestController
@@ -29,11 +31,23 @@ public class TimesheetController {
         this.userServiceClient = userServiceClient;
     }
 
-    @PostMapping(value = "/save-timesheet")
+    @PostMapping(value = "/save")
     public ResponseEntity<TimeSheet> postTimesheet(@RequestBody TimeSheet timesheet, HttpServletRequest httpServletRequest) {
-//        String username = JwtUtil.getSubject(httpServletRequest, Constant.JWT_TOKEN_COOKIE_NAME, Constant.SIGNING_KEY);
-        String username = "john";
-        TimeSheet newTimesheet = timesheetService.createNewTimesheet(timesheet, username);
+        String username = JwtUtil.getSubject(httpServletRequest, Constant.JWT_TOKEN_COOKIE_NAME, Constant.SIGNING_KEY);
+        if (username == null) {
+            return ResponseEntity.ok(new TimeSheet());
+        }
+
+        String weekEnding = timesheet.getWeekEnding().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+        TimeSheet found = timesheetService.getTimesheetByUsernameAndWeekEnding(username, weekEnding);
+
+        TimeSheet newTimesheet = null;
+        if (found == null || found.getId() == null) {
+            newTimesheet = timesheetService.createNewTimesheet(timesheet, username);
+        } else {
+            newTimesheet = timesheetService.updateTimesheet(found, timesheet);
+        }
+
 //        get top five timesheets
         List<TimeSheet> topFiveTimesheetByUsername = timesheetService.getTopFiveTimesheetByUsername(username);
 //        update timesheet in user
@@ -44,7 +58,7 @@ public class TimesheetController {
         return ResponseEntity.ok(newTimesheet);
     }
 
-    @GetMapping(value = "")
+    @GetMapping(value = "/read")
     public ResponseEntity<TimeSheet> getTimesheetByUsernameAndWeekEnding(@RequestParam String username, @RequestParam String weekEnding) {
         TimeSheet timesheet = timesheetService.getTimesheetByUsernameAndWeekEnding(username, weekEnding);
         if (timesheet == null) {

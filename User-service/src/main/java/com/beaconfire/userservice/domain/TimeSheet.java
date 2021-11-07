@@ -19,12 +19,12 @@ public class TimeSheet {
     private ObjectId id;
     private String username;
     private LocalDate weekEnding;
-    private Integer billingHouse;
+    private Integer billingHours;
     private Integer compensatedHours;
     private String submissionStatus;
+    private String submissionInfo;
     private String approvalStatus;
     private String comment;
-    private String submissionInfo;
     private String commentInfo;
     private List<DayDetail> dayDetails;
 }

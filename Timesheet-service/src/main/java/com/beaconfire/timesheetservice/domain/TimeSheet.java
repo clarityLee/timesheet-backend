@@ -23,7 +23,7 @@ public class TimeSheet {
     private String username;
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate weekEnding;
-    private Integer billingHour;
+    private Integer billingHours;
     private Integer compensatedHours;
     private String submissionStatus;
     private String submissionInfo;

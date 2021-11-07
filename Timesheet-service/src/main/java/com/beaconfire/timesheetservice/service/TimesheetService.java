@@ -48,4 +48,18 @@ public class TimesheetService {
     public TimeSheet getTimesheetByUsernameAndWeekEnding(String username, String weekEnding) {
         return timeSheetRepository.findByUsernameAndWeekEnding(username, LocalDate.parse(weekEnding));
     }
+
+    // ↓↓------------- Yun-Jing --------------------- ↓↓
+
+    public TimeSheet updateTimesheet(TimeSheet old, TimeSheet fresh) {
+        old.setBillingHours(fresh.getBillingHours());
+        old.setCompensatedHours(fresh.getCompensatedHours());
+        old.setSubmissionStatus(fresh.getSubmissionStatus());
+        old.setSubmissionInfo(fresh.getSubmissionInfo());
+        old.setApprovalStatus(fresh.getApprovalStatus());
+        old.setComment(fresh.getComment());
+        old.setCommentInfo(fresh.getCommentInfo());
+        old.setDayDetails(fresh.getDayDetails());
+        return timeSheetRepository.save(old);
+    }
 }
