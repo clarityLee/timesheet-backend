@@ -1,9 +1,12 @@
 package com.beaconfire.timesheetservice.service;
 
+import com.beaconfire.timesheetservice.client.UserServiceClient;
 import com.beaconfire.timesheetservice.constant.ApproveStatus;
 import com.beaconfire.timesheetservice.constant.SubmissionStatus;
 import com.beaconfire.timesheetservice.dao.TimeSheetRepository;
 import com.beaconfire.timesheetservice.domain.TimeSheet;
+import com.beaconfire.timesheetservice.domain.UpdateTimesheetRequest;
+import com.sun.istack.NotNull;
 import org.bson.BsonBinarySubType;
 import org.bson.types.Binary;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,9 +27,14 @@ import java.util.stream.Collectors;
 public class TimesheetService {
 
     private TimeSheetRepository timeSheetRepository;
+    private UserServiceClient userServiceClient;
     @Autowired
     public void setTimeSheetRepository(TimeSheetRepository timeSheetRepository) {
         this.timeSheetRepository = timeSheetRepository;
+    }
+    @Autowired
+    public void setUserServiceClient(UserServiceClient userServiceClient) {
+        this.userServiceClient = userServiceClient;
     }
 
     // ↓↓------------- Cynthia --------------------- ↓↓
@@ -63,13 +71,19 @@ public class TimesheetService {
     public TimeSheet updateTimeSheet(TimeSheet old, TimeSheet fresh) {
         old.setBillingHours(fresh.getBillingHours());
         old.setCompensatedHours(fresh.getCompensatedHours());
+
         old.setSubmissionStatus(fresh.getSubmissionStatus());
         old.setSubmissionInfo(fresh.getSubmissionInfo());
         old.setApprovalStatus(fresh.getApprovalStatus());
+
         old.setComment(fresh.getComment());
         old.setCommentInfo(fresh.getCommentInfo());
-        old.setDayDetails(fresh.getDayDetails());
+        old.setUploadType(fresh.getUploadType());
+
+        old.setFloatingRequired(fresh.getFloatingRequired());
+        old.setVacationRequired(fresh.getVacationRequired());
         old.setUploadFile(fresh.getUploadFile());
+        old.setDayDetails(fresh.getDayDetails());
         return timeSheetRepository.save(old);
     }
 
@@ -87,11 +101,48 @@ public class TimesheetService {
         }
         timeSheet.setUploadFile(new Binary(BsonBinarySubType.BINARY, file.getBytes()));
         timeSheetRepository.save(timeSheet);
+
+        updateFiveTimeSheetToUser(username, 0, 0);
         return true;
     }
 
     public List<TimeSheet> getAllListByUsername(String username) {
         Sort sort = Sort.by(Sort.Direction.DESC,"weekEnding");
         return timeSheetRepository.findByUsername(username, sort);
+    }
+
+    public TimeSheet saveTimeSheet(String username, String weekEnding, TimeSheet timeSheet) {
+        TimeSheet found = timeSheetRepository.findByUsernameAndWeekEnding(username, LocalDate.parse(weekEnding));
+
+        int floatingChange = 0;
+        int vacationChange = 0;
+        TimeSheet newTimesheet;
+        if (found == null || found.getId() == null) {
+            floatingChange = -timeSheet.getFloatingRequired();
+            vacationChange = -timeSheet.getVacationRequired();
+            newTimesheet = createNewTimeSheet(timeSheet, username);
+        } else {
+            floatingChange = found.getFloatingRequired() - timeSheet.getFloatingRequired();
+            vacationChange = found.getVacationRequired() - timeSheet.getVacationRequired();
+            newTimesheet = updateTimeSheet(found, timeSheet);
+        }
+
+
+        updateFiveTimeSheetToUser(username, floatingChange, vacationChange);
+        return newTimesheet;
+    }
+
+    public void updateFiveTimeSheetToUser(String username, @NotNull Integer floatingChange, @NotNull Integer vacationChange) {
+
+        // get top five timeSheets
+        List<TimeSheet> topFiveTimesheetByUsername = getTopFiveTimesheetByUsername(username);
+
+        // update timeSheet in user
+        UpdateTimesheetRequest updateTimesheetRequest = new UpdateTimesheetRequest();
+        updateTimesheetRequest.setUsername(username);
+        updateTimesheetRequest.setFloatingChange(floatingChange);
+        updateTimesheetRequest.setVacationChange(vacationChange);
+        updateTimesheetRequest.setTimeSheetList(topFiveTimesheetByUsername);
+        userServiceClient.updateTimesheetByUsername(updateTimesheetRequest);
     }
 }

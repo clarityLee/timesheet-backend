@@ -64,9 +64,13 @@ public class UserService {
         return userRepository.save(user);
     }
 
-    public User updateTimesheetByUsername(String username, List<TimeSheet> timesheets) {
+    public User updateTimesheetByUsername(
+            String username, List<TimeSheet> timeSheets,
+            Integer floatingChange, Integer vacationChange) {
         User user = this.queryUserByName(username);
-        user.setTimeSheets(timesheets);
+        user.setFloating(user.getFloating() + floatingChange);
+        user.setVacation(user.getVacation() + vacationChange);
+        user.setTimeSheets(timeSheets);
         return userRepository.save(user);
     }
 

@@ -26,14 +26,9 @@ import java.util.List;
 public class TimesheetController {
 
     private TimesheetService timeSheetService;
-    private UserServiceClient userServiceClient;
     @Autowired
     public void setTimeSheetService(TimesheetService timeSheetService) {
         this.timeSheetService = timeSheetService;
-    }
-    @Autowired
-    public void setUserServiceClient(UserServiceClient userServiceClient) {
-        this.userServiceClient = userServiceClient;
     }
 
     @PostMapping(value = "/save")
@@ -42,19 +37,8 @@ public class TimesheetController {
         if (username == null) {
             return ResponseEntity.ok(new TimeSheet());
         }
-
         String weekEnding = timeSheet.getWeekEnding().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-        TimeSheet found = timeSheetService.getTimeSheetByUsernameAndWeekEnding(username, weekEnding);
-
-        TimeSheet newTimesheet = null;
-        if (found == null || found.getId() == null) {
-            newTimesheet = timeSheetService.createNewTimeSheet(timeSheet, username);
-        } else {
-            newTimesheet = timeSheetService.updateTimeSheet(found, timeSheet);
-        }
-
-        updateFiveTimeSheetToUser(username);
-        return ResponseEntity.ok(newTimesheet);
+        return ResponseEntity.ok(timeSheetService.saveTimeSheet(username, weekEnding, timeSheet));
     }
 
     @GetMapping(value = "/read")
@@ -83,23 +67,10 @@ public class TimesheetController {
             @RequestParam MultipartFile file) throws IOException {
 
         String username = JwtUtil.getSubject(httpServletRequest, Constant.JWT_TOKEN_COOKIE_NAME, Constant.SIGNING_KEY);
-        if (username == null || !timeSheetService.appendFile(username, weekEnding, uploadType, file))
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-
-        updateFiveTimeSheetToUser(username);
-        return new ResponseEntity<>(HttpStatus.OK);
-    }
-
-    public void updateFiveTimeSheetToUser(String username) {
-
-        // get top five timeSheets
-        List<TimeSheet> topFiveTimesheetByUsername = timeSheetService.getTopFiveTimesheetByUsername(username);
-
-        // update timeSheet in user
-        UpdateTimesheetRequest updateTimesheetRequest = new UpdateTimesheetRequest();
-        updateTimesheetRequest.setUsername(username);
-        updateTimesheetRequest.setTimeSheetList(topFiveTimesheetByUsername);
-        userServiceClient.updateTimesheetByUsername(updateTimesheetRequest);
+        return new ResponseEntity<>(
+                username == null || !timeSheetService.appendFile(username, weekEnding, uploadType, file)
+                ? HttpStatus.BAD_REQUEST : HttpStatus.OK
+        );
     }
 
 }

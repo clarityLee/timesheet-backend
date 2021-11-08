@@ -27,14 +27,18 @@ public class TimeSheet {
     private LocalDate weekEnding;
     private Integer billingHours;
     private Integer compensatedHours;
+
     private String submissionStatus;
     private String submissionInfo;
     private String approvalStatus;
+
     private String comment;
     private String commentInfo;
     private String uploadType;
+
     private Integer floatingRequired;
     private Integer vacationRequired;
+
     @JsonIgnore
     private Binary uploadFile;
     private List<DayDetail> dayDetails;

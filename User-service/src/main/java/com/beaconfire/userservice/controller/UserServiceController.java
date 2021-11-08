@@ -73,11 +73,12 @@ public class UserServiceController {
     }
 
     @PostMapping(value = "/update-timesheet")
-    public ResponseEntity<Void> updateTimesheetByUsername(@RequestBody UpdateTimesheetRequest updateTimesheetRequest) {
-        String username = updateTimesheetRequest.getUsername();
-        List<TimeSheet> timesheets = updateTimesheetRequest.getTimeSheetList();
+    public ResponseEntity<Void> updateTimesheetByUsername(@RequestBody UpdateTimesheetRequest utr) {
+        String username = utr.getUsername();
+        List<TimeSheet> timesheets = utr.getTimeSheetList();
         System.out.println("successfully in user service client: " + username);
-        User user = userService.updateTimesheetByUsername(username, timesheets);
+        User user = userService.updateTimesheetByUsername(
+                username, timesheets, utr.getFloatingChange(), utr.getVacationChange());
         return new ResponseEntity<>(HttpStatus.OK);
 //        return null;
     }
