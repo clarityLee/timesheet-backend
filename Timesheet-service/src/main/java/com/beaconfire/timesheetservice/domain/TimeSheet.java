@@ -1,9 +1,11 @@
 package com.beaconfire.timesheetservice.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import org.bson.types.Binary;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -30,5 +32,8 @@ public class TimeSheet {
     private String approvalStatus;
     private String comment;
     private String commentInfo;
+    private String uploadType;
+    @JsonIgnore
+    private Binary uploadFile;
     private List<DayDetail> dayDetails;
 }

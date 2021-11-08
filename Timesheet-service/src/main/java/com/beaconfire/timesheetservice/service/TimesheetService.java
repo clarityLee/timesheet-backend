@@ -1,10 +1,17 @@
 package com.beaconfire.timesheetservice.service;
 
+import com.beaconfire.timesheetservice.constant.ApproveStatus;
+import com.beaconfire.timesheetservice.constant.SubmissionStatus;
 import com.beaconfire.timesheetservice.dao.TimeSheetRepository;
 import com.beaconfire.timesheetservice.domain.TimeSheet;
+import org.bson.BsonBinarySubType;
+import org.bson.types.Binary;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.sql.Time;
 import java.time.LocalDate;
 import java.util.Collection;
@@ -23,9 +30,10 @@ public class TimesheetService {
     }
 
     // ↓↓------------- Cynthia --------------------- ↓↓
-    public TimeSheet createNewTimesheet(TimeSheet timesheet, String username) {
+    public TimeSheet createNewTimeSheet(TimeSheet timesheet, String username) {
         timesheet.setUsername(username);
-        System.out.println(timesheet);
+        timesheet.setApprovalStatus(ApproveStatus.Not_Approved.toString());
+        timesheet.setSubmissionStatus(SubmissionStatus.Incomplete.toString());
         return timeSheetRepository.save(timesheet);
     }
 
@@ -45,13 +53,13 @@ public class TimesheetService {
         return allByUsername.stream().limit(5).collect(Collectors.toList());
     }
 
-    public TimeSheet getTimesheetByUsernameAndWeekEnding(String username, String weekEnding) {
+    public TimeSheet getTimeSheetByUsernameAndWeekEnding(String username, String weekEnding) {
         return timeSheetRepository.findByUsernameAndWeekEnding(username, LocalDate.parse(weekEnding));
     }
 
     // ↓↓------------- Yun-Jing --------------------- ↓↓
 
-    public TimeSheet updateTimesheet(TimeSheet old, TimeSheet fresh) {
+    public TimeSheet updateTimeSheet(TimeSheet old, TimeSheet fresh) {
         old.setBillingHours(fresh.getBillingHours());
         old.setCompensatedHours(fresh.getCompensatedHours());
         old.setSubmissionStatus(fresh.getSubmissionStatus());
@@ -60,6 +68,27 @@ public class TimesheetService {
         old.setComment(fresh.getComment());
         old.setCommentInfo(fresh.getCommentInfo());
         old.setDayDetails(fresh.getDayDetails());
+        old.setUploadFile(fresh.getUploadFile());
         return timeSheetRepository.save(old);
+    }
+
+    public boolean appendFile(String username, String weekEnding,
+                              String uploadType, MultipartFile file) throws IOException {
+
+        TimeSheet timeSheet = timeSheetRepository.findByUsernameAndWeekEnding(username, LocalDate.parse(weekEnding));
+        if (timeSheet == null || timeSheet.getId() == null)
+            return false;
+
+        timeSheet.setUploadType(uploadType);
+        if ("approved".equals(uploadType))
+            timeSheet.setSubmissionStatus(SubmissionStatus.Complete.toString());
+        timeSheet.setUploadFile(new Binary(BsonBinarySubType.BINARY, file.getBytes()));
+        timeSheetRepository.save(timeSheet);
+        return true;
+    }
+
+    public List<TimeSheet> getAllListByUsername(String username) {
+        Sort sort = Sort.by(Sort.Direction.DESC,"weekEnding");
+        return timeSheetRepository.findByUsername(username, sort);
     }
 }

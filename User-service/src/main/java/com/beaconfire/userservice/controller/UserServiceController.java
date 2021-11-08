@@ -39,6 +39,11 @@ public class UserServiceController {
         return ResponseEntity.ok(userService.createRandomUser(username, password));
     }
 
+    @PostMapping("/create")
+    public ResponseEntity<User> createUser(@RequestBody User user) {
+        return ResponseEntity.ok(userService.createUser(user));
+    }
+
     @GetMapping("/user/{id}")
     public ResponseEntity<User> getUserById(@PathVariable String id) {
         return ResponseEntity.ok(userService.queryUserById(id));

@@ -44,6 +44,10 @@ public class UserService {
         return userRepository.findByUsername(username).orElseGet(User::new);
     }
 
+    public User createUser(User user) {
+        return userRepository.save(user);
+    }
+
     // ↓↓------------- Cynthia --------------------- ↓↓
     public User updateUserProfile(String username, Map<String, String> updatedInfo) {
         Optional<User> optionalUser = userRepository.findByUsername(username);
@@ -65,6 +69,7 @@ public class UserService {
         user.setTimeSheets(timesheets);
         return userRepository.save(user);
     }
+
 
     // ↓↓ -------------- Xian ------------------------ ↓↓
 
