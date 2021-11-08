@@ -33,6 +33,8 @@ public class TimeSheet {
     private String comment;
     private String commentInfo;
     private String uploadType;
+    private Integer floatingRequired;
+    private Integer vacationRequired;
     @JsonIgnore
     private Binary uploadFile;
     private List<DayDetail> dayDetails;

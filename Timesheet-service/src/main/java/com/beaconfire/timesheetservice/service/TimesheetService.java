@@ -34,6 +34,7 @@ public class TimesheetService {
         timesheet.setUsername(username);
         timesheet.setApprovalStatus(ApproveStatus.Not_Approved.toString());
         timesheet.setSubmissionStatus(SubmissionStatus.Incomplete.toString());
+        timesheet.setSubmissionInfo("Items due: Proof of Approved TimeSheet");
         return timeSheetRepository.save(timesheet);
     }
 
@@ -80,8 +81,10 @@ public class TimesheetService {
             return false;
 
         timeSheet.setUploadType(uploadType);
-        if ("approved".equals(uploadType))
+        if ("approved".equals(uploadType)) {
             timeSheet.setSubmissionStatus(SubmissionStatus.Complete.toString());
+            timeSheet.setSubmissionInfo("");
+        }
         timeSheet.setUploadFile(new Binary(BsonBinarySubType.BINARY, file.getBytes()));
         timeSheetRepository.save(timeSheet);
         return true;

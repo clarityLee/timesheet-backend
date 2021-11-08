@@ -26,6 +26,8 @@ public class User {
     private String phone;
     private String email;
     private String address;
+    private Integer floating;
+    private Integer vacation;
     private List<TimeSheet> timeSheets;
     private List<Contact> contacts;
 }
